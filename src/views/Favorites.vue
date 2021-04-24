@@ -1,5 +1,5 @@
 <template>
-  <div class="favorites">
+  <el-main>
     <h1>Избранное</h1>
-  </div>
+  </el-main>
 </template>
