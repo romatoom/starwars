@@ -12,7 +12,7 @@
             <span v-if="ent.type !== 'films'">{{ ent.entity.name }}</span>
             <span v-else>{{ ent.entity.title }}</span>
             <div class="bottom clearfix">
-              <el-button type="primary" class="button">Добавить в избранное</el-button>
+              <el-button @click="addToFavorites(ent.id)" type="primary" class="button">Добавить в избранное</el-button>
             </div>
           </div>
         </el-card>
@@ -28,6 +28,7 @@ export default {
   name: 'Search',
   data: () => ({
     findText: '',
+    favoritesIDs: [],
     entities: []
   }),
   computed: {
@@ -43,7 +44,7 @@ export default {
   },
   methods: {
     errLoadImg (e) {
-      e.target.src = '../assets/placeholder.jpg'
+      e.target.src = 'https://i.ibb.co/bbRSQmh/CREATOR-gd-jpeg-v1-0-using-IJG-JPEG-v62-quality-85.jpg'
     },
     async getAllEntities () {
       // получаем виды сущностей
@@ -67,11 +68,20 @@ export default {
         })
       })
       return entities
+    },
+    addToFavorites (id) {
+      this.favoritesIDs.push(id)
+      localStorage.setItem('favorites_ids', JSON.stringify(this.favoritesIDs))
     }
   },
   async mounted () {
     this.entities = await this.getAllEntities()
-    console.log(this.entities)
+    this.favoritesIDs = JSON.parse(localStorage.getItem('favorites_ids'))
+    if (this.favoritesIDs === null) {
+      this.favoritesIDs = []
+      localStorage.setItem('favorites_ids', JSON.stringify(this.favoritesIDs))
+    }
+    console.log(this.favoritesIDs)
   }
 }
 </script>
