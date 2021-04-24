@@ -12,7 +12,7 @@
             <span v-if="ent.type !== 'films'">{{ ent.entity.name }}</span>
             <span v-else>{{ ent.entity.title }}</span>
             <div class="bottom clearfix">
-              <el-button type="text" class="button">Добавить в избранное</el-button>
+              <el-button type="primary" class="button">Добавить в избранное</el-button>
             </div>
           </div>
         </el-card>
@@ -27,7 +27,6 @@ import BackendApi from '../assets/js/libs/BackendApi'
 export default {
   name: 'Search',
   data: () => ({
-    links: [],
     findText: '',
     entities: []
   }),
@@ -44,7 +43,7 @@ export default {
   },
   methods: {
     errLoadImg (e) {
-      e.target.src = 'https://starwars-visualguide.com/assets/img/placeholder.jpg'
+      e.target.src = '../assets/placeholder.jpg'
     },
     async getAllEntities () {
       // получаем виды сущностей
@@ -68,35 +67,9 @@ export default {
         })
       })
       return entities
-    },
-    // методы для работы Autocomplite
-    querySearch (queryString, cb) {
-      const links = this.links
-      var results = queryString ? links.filter(this.createFilter(queryString)) : links
-      cb(results)
-    },
-    createFilter (queryString) {
-      return (link) => {
-        return (link.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0)
-      }
-    },
-    loadAll () {
-      return [
-        { value: 'vue', link: 'https://github.com/vuejs/vue' },
-        { value: 'element', link: 'https://github.com/ElemeFE/element' },
-        { value: 'cooking', link: 'https://github.com/ElemeFE/cooking' },
-        { value: 'mint-ui', link: 'https://github.com/ElemeFE/mint-ui' },
-        { value: 'vuex', link: 'https://github.com/vuejs/vuex' },
-        { value: 'vue-router', link: 'https://github.com/vuejs/vue-router' },
-        { value: 'babel', link: 'https://github.com/babel/babel' }
-      ]
-    },
-    handleSelect (item) {
-      console.log(item)
     }
   },
   async mounted () {
-    this.links = this.loadAll()
     this.entities = await this.getAllEntities()
     console.log(this.entities)
   }
@@ -105,13 +78,13 @@ export default {
 
 <style scoped>
 .button {
-  padding: 0;
   float: right;
 }
 .image {
   width: 100%;
   display: block;
-  max-height: 20em;
+  height: 400px;
+  max-height: 400px;
   object-fit: cover;
 }
 .clearfix:before, .clearfix:after {
