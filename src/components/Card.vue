@@ -19,6 +19,7 @@
 <script>
 import { mapGetters, mapActions } from 'vuex'
 import translateTypeEntities from '../assets/js/libs/translate'
+import placeholder from '../assets/placeholder.jpg'
 
 export default {
   name: 'Card',
@@ -37,7 +38,7 @@ export default {
       return translateTypeEntities(type)
     },
     errLoadImg (e) {
-      e.target.src = 'https://i.ibb.co/bbRSQmh/CREATOR-gd-jpeg-v1-0-using-IJG-JPEG-v62-quality-85.jpg'
+      e.target.src = placeholder
     },
     addToFavorites (url) {
       this.addFavorite(url)
