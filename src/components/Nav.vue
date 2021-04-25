@@ -1,11 +1,11 @@
 <template>
   <el-header>
-    <el-menu :default-active="activeIndex" @select="handleSelect" mode="horizontal">
-      <el-menu-item index="Search">
-        <router-link class="nav-item" to="/">Поиск</router-link>
+    <el-menu :default-active="activeLink" :router="true" mode="horizontal">
+      <el-menu-item index="/" :route="{ name: 'Search'}" class="nav-item">
+        Поиск
       </el-menu-item>
-      <el-menu-item index="Favorites">
-        <router-link class="nav-item" to="/favorites">Избранное</router-link>
+      <el-menu-item index="/favorites" :route="{ name: 'Favorites'}" class="nav-item">
+        Избранное
       </el-menu-item>
     </el-menu>
   </el-header>
@@ -15,12 +15,15 @@
 export default {
   name: 'Nav',
   data: () => ({
-    activeIndex: 'Search'
+    activeLink: 'Search'
   }),
-  methods: {
-    handleSelect (key) {
-      this.$router.push({ name: key }).catch(() => {})
+  watch: {
+    $route (to, from) {
+      this.activeLink = to.path
     }
+  },
+  mounted () {
+    this.activeLink = this.$route.path
   }
 }
 </script>

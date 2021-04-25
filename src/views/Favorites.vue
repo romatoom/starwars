@@ -2,15 +2,17 @@
   <el-main>
     <h1>Избранное</h1>
     <el-row :gutter="10">
-      <el-col v-for="(ent, k) in findedEntities" :key="k"
+      <el-col v-for="(ent, k) in allFavorites" :key="k"
         :xs="24" :sm="24" :md="12" :lg="8" :xl="6">
         <el-card :body-style="{ padding: '0px' }">
-          <img :src="`${ent.imgSrc}`" @error="errLoadImg" class="image">
+          <img :src="`${ent.imgSrc}`" @error="errLoadImg" loading="lazy" class="image">
           <div style="padding: 14px;">
             <span v-if="ent.type !== 'films'">{{ ent.entity.name }}</span>
             <span v-else>{{ ent.entity.title }}</span>
             <div class="bottom clearfix">
-              <el-button @click="addToFavorites(ent.id)" type="primary" class="button">Добавить в избранное</el-button>
+              <el-button @click="deleteFromeFavorites(ent.entity.url)" type="danger" class="button">
+                Убрать из избранного
+              </el-button>
             </div>
           </div>
         </el-card>
@@ -20,59 +22,21 @@
 </template>
 
 <script>
-import BackendApi from '../assets/js/libs/BackendApi'
+// import BackendApi from '../assets/js/libs/BackendApi'
+import { mapGetters, mapActions } from 'vuex'
 
 export default {
   name: 'Favorites',
-  data: () => ({
-    favoritesIDs: [],
-    entities: []
-  }),
   computed: {
-    favoritesEntities () {
-      return this.entities.filter((el) => {
-        // el.id === 
-      })
-    }
+    ...mapGetters(['allFavorites'])
   },
   methods: {
+    ...mapActions(['deleteFavorite']),
     errLoadImg (e) {
       e.target.src = 'https://i.ibb.co/bbRSQmh/CREATOR-gd-jpeg-v1-0-using-IJG-JPEG-v62-quality-85.jpg'
     },
-    async getAllEntities () {
-      // получаем виды сущностей
-      const types = await BackendApi.getTypesEntities()
-      const entities = []
-      let id = 0
-      types.forEach(async (type) => {
-        const ents = await BackendApi.getEntities(type)
-        ents.forEach((ent) => {
-          const reg = /\d+/
-          const urlId = ent.url.match(reg)
-          const urlType = type === 'people' ? 'characters' : type
-          const entsObj = {
-            id: id++,
-            type: type,
-            entity: ent,
-            imgSrc: `https://starwars-visualguide.com/assets/img/${urlType}/${urlId}.jpg`
-          }
-          console.log()
-          entities.push(entsObj)
-        })
-      })
-      return entities
-    },
-    addToFavorites (id) {
-      this.favoritesIDs.push(id)
-      localStorage.setItem('favorites_ids', JSON.stringify(this.favoritesIDs))
-    }
-  },
-  async mounted () {
-    this.entities = await this.getAllEntities()
-    this.favoritesIDs = JSON.parse(localStorage.getItem('favorites_ids'))
-    if (this.favoritesIDs === null) {
-      this.favoritesIDs = []
-      localStorage.setItem('favorites_ids', JSON.stringify(this.favoritesIDs))
+    deleteFromeFavorites (url) {
+      this.deleteFavorite(url)
     }
   }
 }
@@ -100,4 +64,3 @@ export default {
   margin-bottom: 1em;
 }
 </style>
-
