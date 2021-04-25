@@ -2,6 +2,7 @@
   <div id="app">
     <Nav />
     <router-view/>
+    <el-backtop></el-backtop>
   </div>
 </template>
 

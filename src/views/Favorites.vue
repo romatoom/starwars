@@ -4,40 +4,23 @@
     <el-row :gutter="10">
       <el-col v-for="(ent, k) in allFavorites" :key="k"
         :xs="24" :sm="24" :md="12" :lg="8" :xl="6">
-        <el-card :body-style="{ padding: '0px' }">
-          <img :src="`${ent.imgSrc}`" @error="errLoadImg" loading="lazy" class="image">
-          <div style="padding: 14px;">
-            <span v-if="ent.type !== 'films'">{{ ent.entity.name }}</span>
-            <span v-else>{{ ent.entity.title }}</span>
-            <div class="bottom clearfix">
-              <el-button @click="deleteFromeFavorites(ent.entity.url)" type="danger" class="button">
-                Убрать из избранного
-              </el-button>
-            </div>
-          </div>
-        </el-card>
+        <Card :ent="ent" />
       </el-col>
     </el-row>
   </el-main>
 </template>
 
 <script>
-// import BackendApi from '../assets/js/libs/BackendApi'
-import { mapGetters, mapActions } from 'vuex'
+import Card from '../components/Card'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'Favorites',
+  components: {
+    Card
+  },
   computed: {
     ...mapGetters(['allFavorites'])
-  },
-  methods: {
-    ...mapActions(['deleteFavorite']),
-    errLoadImg (e) {
-      e.target.src = 'https://i.ibb.co/bbRSQmh/CREATOR-gd-jpeg-v1-0-using-IJG-JPEG-v62-quality-85.jpg'
-    },
-    deleteFromeFavorites (url) {
-      this.deleteFavorite(url)
-    }
   }
 }
 </script>
