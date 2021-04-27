@@ -37,11 +37,7 @@
           label="Действие"
           width="200">
           <template slot-scope="scope">
-            <el-button v-if="!(allFavoritesURLs.includes(scope.row.entity.url))"
-              @click="addFavorite(scope.row.entity.url)" type="primary" class="button">
-              Добавить в избранное
-            </el-button>
-            <el-button v-else @click="deleteFavorite(scope.row.entity.url)"
+            <el-button @click="deleteFavorite(scope.row.entity.url)"
               type="danger" class="button">
               Убрать из избранного
             </el-button>
@@ -60,7 +56,19 @@
     </template>
     <!-- ДЕРЕВО -->
     <template v-else>
-      <el-tree :data="dataTree" :props="defaultProps" @node-click="handleNodeClick"></el-tree>
+      <el-tree :data="dataTree" :props="defaultProps" node-key="id">
+        <span class="custom-tree-node" slot-scope="{ node, data }">
+          <span>{{ node.label }}</span>
+          <span v-if="data.url !== undefined">
+            <el-button
+              type="text"
+              size="mini"
+              @click="deleteFavorite(data.url)">
+              Убрать из избранного
+            </el-button>
+          </span>
+        </span>
+      </el-tree>
     </template>
   </el-main>
 </template>
@@ -76,46 +84,10 @@ export default {
   data: () => ({
     view: 'Список',
     dataTree: [],
-    dataT: [
-      {
-        label: 'Level one 1',
-        children: [{
-          label: 'Level two 1-1',
-          children: [{
-            label: 'Level three 1-1-1'
-          }]
-        }]
-      }, {
-        label: 'Level one 2',
-        children: [{
-          label: 'Level two 2-1',
-          children: [{
-            label: 'Level three 2-1-1'
-          }]
-        }, {
-          label: 'Level two 2-2',
-          children: [{
-            label: 'Level three 2-2-1'
-          }]
-        }]
-      }, {
-        label: 'Level one 3',
-        children: [{
-          label: 'Level two 3-1',
-          children: [{
-            label: 'Level three 3-1-1'
-          }]
-        }, {
-          label: 'Level two 3-2',
-          children: [{
-            label: 'Level three 3-2-1'
-          }]
-        }]
-      }
-    ],
     defaultProps: {
       children: 'children',
-      label: 'label'
+      label: 'label',
+      url: 'url'
     }
   }),
   components: {
@@ -123,25 +95,29 @@ export default {
   },
   watch: {
     allFavorites: async function () {
+      const loading = this.$loading({
+        lock: true,
+        text: 'ФОРМИРОВАНИЕ ИЗБРАННОГО (ОБНОВЛЕНИЕ ДАННЫХ)',
+        spinner: 'el-icon-loading',
+        background: 'rgba(0, 0, 0, 0.7)'
+      })
       await this.updateDataTree()
+      loading.close()
     }
   },
   computed: {
     ...mapGetters(['allFavorites', 'allFavoritesURLs'])
   },
   methods: {
-    ...mapActions(['addFavorite', 'deleteFavorite']),
+    ...mapActions(['deleteFavorite']),
     translateTE (type) {
       return translateTypeEntities(type)
-    },
-    handleNodeClick (data) {
-      console.log(data)
     },
     async updateDataTree () {
       try {
         this.dataTree = [] // данные для элемента Tree
         const filmsTitles = [] // список уникальных названий фильмов
-        const entytiesDatas = [] // список сущностей, их типов и фильмов, где они встречаются
+        const entytiesDatas = [] // список сущностей, их типов и фильмов, где они встречаются + url избранного
 
         const promises = this.allFavorites.map(async (fav) => {
           let nameEnt
@@ -153,7 +129,7 @@ export default {
           const typeEnt = fav.type
           const promises = fav.entity.films.map(async (filmURL) => {
             const film = await BackendApi.getEntityByURL(filmURL)
-            entytiesDatas.push({ nameEnt, typeEnt, filmEnt: film.title })
+            entytiesDatas.push({ nameEnt, typeEnt, filmEnt: film.title, url: fav.entity.url })
             // добавляем уникальные названия фильмов
             if (!filmsTitles.includes(film.title)) filmsTitles.push(film.title)
           })
@@ -161,37 +137,42 @@ export default {
         })
         await Promise.all(promises)
 
-        console.log('entytiesDatas', entytiesDatas)
-        console.log('filmsTitles', filmsTitles)
-        // console.log('typeEntities', typeEntities)
-
-        /* entytiesDatas.forEach((entData) => {
-          const typeEntities = [] // список уникальных типов сущностей
-          const filmObj = { label: filmTitle, children: [] }
-          this.dataTree.push(filmObj)
-        }) */
         filmsTitles.forEach((filmTitle) => {
           const typeEntities = [] // список уникальных типов сущностей
+          const childrenFilm = []
           entytiesDatas.forEach((entData) => {
             // добаваляем уникальные типы сущностей
             if (filmTitle === entData.filmEnt && !typeEntities.includes(entData.typeEnt)) {
-              typeEntities.forEach((typeEnt) => {
-                // if ()
+              const childrenType = []
+              const type = entData.typeEnt
+              entytiesDatas.forEach((entData2) => {
+                if (filmTitle === entData2.filmEnt && type === entData2.typeEnt) {
+                  childrenType.push({ label: entData2.nameEnt, url: entData2.url })
+                }
               })
-              typeEntities.push({ label: entData.typeEnt, children})
+              typeEntities.push(entData.typeEnt)
+              childrenFilm.push({ label: this.translateTE(entData.typeEnt), children: childrenType })
             }
           })
-          console.log('typeEntities', typeEntities)
-          
-          const filmObj = { label: filmTitle, children: typeEntities }
+          // console.log(childrenFilm)
+          // console.log('typeEntities', typeEntities)
+          const filmObj = { label: filmTitle, children: childrenFilm }
           this.dataTree.push(filmObj)
         })
-
-        // this.dataTree = this.dataT
       } catch (err) {
         console.error(err)
       }
     }
+  },
+  async mounted () {
+    const loading = this.$loading({
+      lock: true,
+      text: 'ФОРМИРОВАНИЕ ИЗБРАННОГО (ОБНОВЛЕНИЕ ДАННЫХ)',
+      spinner: 'el-icon-loading',
+      background: 'rgba(0, 0, 0, 0.7)'
+    })
+    await this.updateDataTree()
+    loading.close()
   }
 }
 </script>
@@ -222,4 +203,12 @@ export default {
   font-size: 1em;
   margin-bottom: 0.5em;
 }
+.custom-tree-node {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 14px;
+    padding-right: 8px;
+  }
 </style>
