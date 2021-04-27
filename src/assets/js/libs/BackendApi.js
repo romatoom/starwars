@@ -42,13 +42,25 @@ class BackendApi {
     return entities
   }
 
+  static async getEntityByURL (url) {
+    let entity = null
+    try {
+      const resp = await axios.get(url)
+      entity = resp.data
+    } catch (err) {
+      console.error(err)
+    }
+    return entity
+  }
+
+  /*
   static async getPeopleByID (id) {
     const people = null
     try {
       const resp = await axios.get(`${SWAPI_PATH}/people/${id}`)
-      /* if (resp && resp.data && resp.data.results) {
+      if (resp && resp.data && resp.data.results) {
         people = resp.data.results
-      } */
+      }
       console.log(resp)
     } catch (err) {
       console.log(err)
@@ -91,6 +103,7 @@ class BackendApi {
     vehicles = await BackendApi.getEntities('vehicles')
     return vehicles
   }
+  */
 }
 
 export default BackendApi

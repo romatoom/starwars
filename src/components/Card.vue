@@ -5,10 +5,10 @@
       <span v-if="ent.type !== 'films'"><strong>{{ ent.entity.name }}</strong></span>
       <span v-else><strong>{{ ent.entity.title }}</strong></span>: {{ translateTE(ent.type) }}
       <div class="bottom clearfix">
-        <el-button v-if="!(allFavoritesURLs.includes(ent.entity.url))" @click="addToFavorites(ent.entity.url)" type="primary" class="button">
+        <el-button v-if="!(allFavoritesURLs.includes(ent.entity.url))" @click="addFavorite(ent.entity.url)" type="primary" class="button">
           Добавить в избранное
         </el-button>
-        <el-button v-else @click="deleteFromeFavorites(ent.entity.url)" type="danger" class="button">
+        <el-button v-else @click="deleteFavorite(ent.entity.url)" type="danger" class="button">
           Убрать из избранного
         </el-button>
       </div>
@@ -39,12 +39,6 @@ export default {
     },
     errLoadImg (e) {
       e.target.src = placeholder
-    },
-    addToFavorites (url) {
-      this.addFavorite(url)
-    },
-    deleteFromeFavorites (url) {
-      this.deleteFavorite(url)
     }
   },
   mounted () {
