@@ -113,7 +113,6 @@ export default {
     translateTE (type) {
       return translateTypeEntities(type)
     },
-
     // метод для формирования дерева избранного
     async updateDataTree () {
       try {
@@ -168,7 +167,7 @@ export default {
           let url = entytiesDatas[0].url
           let childrenFilm = []
           let childrenType = []
-          childrenType.push({ label: name, url })
+          // childrenType.push({ label: name, url })
 
           entytiesDatas.forEach((entData) => {
             if (entData.filmEnt !== film) { // следующий фильм - записываем предыдущие данные
