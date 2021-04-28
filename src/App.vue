@@ -29,12 +29,16 @@ export default {
         spinner: 'el-icon-loading',
         background: 'rgba(0, 0, 0, 0.7)'
       })
+      console.log('Начало загрузки сущностей')
       await this.loadAllEntities()
+      console.log('Сущности загружены')
+      // загружаем избранное
+      if (this.allFavorites.length === 0) {
+        console.log('Начало загрузки избранного')
+        this.loadFavorites()
+        console.log('Избранное загружено')
+      }
       loading.close()
-    }
-    // загружаем избранное
-    if (this.allFavorites.length === 0) {
-      this.loadFavorites()
     }
   }
 }
