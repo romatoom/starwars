@@ -28,17 +28,17 @@
         </el-table-column>
         <el-table-column
           label="Тип сущности"
-          width="auto">
+          width="200">
           <template slot-scope="scope">
             {{ translateTE((scope.row.type)) }}
           </template>
         </el-table-column>
         <el-table-column
           label="Действие"
-          width="200">
+          width="250">
           <template slot-scope="scope">
             <el-button @click="deleteFavorite(scope.row.entity.url)"
-              type="danger" class="button">
+              type="danger">
               Убрать из избранного
             </el-button>
           </template>
